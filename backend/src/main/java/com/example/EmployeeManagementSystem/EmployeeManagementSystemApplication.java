@@ -25,10 +25,14 @@ public class EmployeeManagementSystemApplication {
 		return args ->{
 			if(roleRepository.findByAuthority("ROLE_ADMIN").isPresent()) return;
 			Role adminRole = roleRepository.save(new Role("ROLE_ADMIN"));
+			Role simpleAdminRole = roleRepository.save(new Role("ROLE_SIMPLE_ADMIN"));
 			roleRepository.save(new Role("ROLE_USER"));
 
 			List<Role> roles= new ArrayList<>();
 			roles.add(adminRole);
+
+			List<Role> roles2= new ArrayList<>();
+			roles2.add(simpleAdminRole);
 
 			Customer admin = new Customer(
 					"admin",
@@ -37,6 +41,14 @@ public class EmployeeManagementSystemApplication {
 					roles);
 
 			customerRepository.save(admin);
+
+			Customer simpleAdmin = new Customer(
+					"simpleAdmin",
+					"simpleAdmin@gmail.com",
+					passwordEncode.encode("password"),
+					roles2);
+
+			customerRepository.save(simpleAdmin);
 		};
 	}
 }
