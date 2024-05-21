@@ -23,15 +23,15 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request){
         AuthenticationResponse response = authenticationService.login(request);
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, response.token())
+                .header(HttpHeaders.AUTHORIZATION, response.getToken())
                 .body(response);
     }
 
     @PostMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest request) {
-        String token = request.accessToken();
-        String username = request.username();
-        boolean isValid = !jwtUtil.isTokenValid(token, username);
+        String token = request.getAccessToken();
+        String username = request.getUsername();
+        boolean isValid = jwtUtil.isTokenValid(token, username);
 
         if (isValid) {
             return ResponseEntity.ok("Token is valid");
