@@ -26,24 +26,24 @@ public class CustomerService {
         this.roleRepository = roleRepository;
     }
 
-    public List<CustomerDTO> getAllCustomers(){
-
-        return customerDataAccessService.selectAllCustomers().stream().map(customerDTOMapper)
+    public List<CustomerDTO> getAllCustomers() {
+        return customerDataAccessService.selectAllCustomers().stream()
+                .map(customerDTOMapper)
                 .collect(Collectors.toList());
     }
 
-    public CustomerDTO getCustomer(Long id){
-        return customerDataAccessService.selectCustomerByID(id).map(customerDTOMapper)
+    public CustomerDTO getCustomer(Long id) {
+        return customerDataAccessService.selectCustomerByID(id)
+                .map(customerDTOMapper)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(id)
                 ));
     }
 
-    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest){
-
-        String email = customerRegistrationRequest.email();
-        //check if email exists
-        if(customerDataAccessService.existsPersonWithEmail(email)){
+    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
+        String email = customerRegistrationRequest.getEmail();
+        // Check if email exists
+        if (customerDataAccessService.existsPersonWithEmail(email)) {
             throw new DuplicateResourceException("email already taken");
         }
 
@@ -51,52 +51,47 @@ public class CustomerService {
         List<Role> authorities = new ArrayList<>();
         authorities.add(userRole);
 
-        //otherwise add
+        // Otherwise add
         Customer customer = new Customer(
-                customerRegistrationRequest.name(),
-                customerRegistrationRequest.email(),
-                passwordEncoder.encode(customerRegistrationRequest.password()),
+                customerRegistrationRequest.getName(),
+                customerRegistrationRequest.getEmail(),
+                passwordEncoder.encode(customerRegistrationRequest.getPassword()),
                 authorities
         );
         customerDataAccessService.insertCustomer(customer);
-
     }
 
-    public void deleteCustomerById(Long custmerId){
-
-        //check if id exists
-        if(!customerDataAccessService.existsPersonWithId(custmerId)){
-            throw new ResourceNotFoundException("Customer with id [%s] not found".formatted(custmerId));
+    public void deleteCustomerById(Long customerId) {
+        // Check if id exists
+        if (!customerDataAccessService.existsPersonWithId(customerId)) {
+            throw new ResourceNotFoundException("Customer with id [%s] not found".formatted(customerId));
         }
 
-        //otherwise remove
-        customerDataAccessService.deleteCustomerById(custmerId);
-
+        // Otherwise remove
+        customerDataAccessService.deleteCustomerById(customerId);
     }
 
-    public void updateCustomer(CustomerUpdateRequest updateRequest, Long customerId){
-
+    public void updateCustomer(CustomerUpdateRequest updateRequest, Long customerId) {
         Customer customer = customerDataAccessService.selectCustomerByID(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(customerId)
                 ));
         boolean changes = false;
-        //check if attributes need change exists
-        if (updateRequest.name() != null && !updateRequest.name().equals(customer.getName())){
-            customer.setName(updateRequest.name());
+        // Check if attributes need change exists
+        if (updateRequest.getName() != null && !updateRequest.getName().equals(customer.getName())) {
+            customer.setName(updateRequest.getName());
             changes = true;
         }
 
-        if (updateRequest.email() != null && !updateRequest.email().equals(customer.getEmail())){
-            if(customerDataAccessService.existsPersonWithEmail(updateRequest.email())){
+        if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(customer.getEmail())) {
+            if (customerDataAccessService.existsPersonWithEmail(updateRequest.getEmail())) {
                 throw new DuplicateResourceException("email already taken");
             }
-            customer.setEmail(updateRequest.email());
+            customer.setEmail(updateRequest.getEmail());
             changes = true;
         }
-        //otherwise update
-
-        if (!changes){
+        // Otherwise update
+        if (!changes) {
             throw new RequestValidationException("no data changes found");
         }
 
