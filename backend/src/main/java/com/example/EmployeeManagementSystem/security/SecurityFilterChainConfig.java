@@ -42,7 +42,7 @@ public class SecurityFilterChainConfig {
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/departments/{id}").hasAnyRole("USER", "SIMPLE_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/departments").hasAnyRole("USER", "SIMPLE_ADMIN", "ADMIN")
-                                .requestMatchers("/api/v1/employees/**").hasAnyRole("SIMPLE_ADMIN", "ADMIN")
+                                .requestMatchers("/api/v1/employees/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/departments").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/departments/{id}").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/departments/{id}").hasRole("ADMIN")
